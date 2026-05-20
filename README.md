@@ -47,8 +47,9 @@ spec:
     - ipBlock:
         cidr: 192.168.0.182/32 # ALLOW Outbound Traffic to Bastion Only
 
+---
 
-3. Real-World Lab Validation Results
+## 3. Real-World Lab Validation Results
 The following test scenarios verify the runtime enforcement of the OVN-Kubernetes stateful firewall rules:
 
 Test Case 1: Bastion Management Plane Verification
