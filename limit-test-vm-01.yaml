@@ -1,0 +1,27 @@
+apiVersion: k8s.cni.cncf.io/v1beta1
+kind: MultiNetworkPolicy
+metadata:
+  name: limit-test-vm-01-access
+  namespace: default
+  annotations:
+    k8s.v1.cni.cncf.io/policy-for: "default/nad-04"
+spec:
+  # Target test-vm-01 specifically
+  podSelector:
+    matchLabels:
+      app: test-vm-01
+  policyTypes:
+  - Ingress
+  - Egress
+
+  # 1. ALLOW Ingress (Inbound) ONLY from test-vm-02
+  ingress:
+  - from:
+    - ipBlock:
+        cidr: 192.168.0.182/32 # Only test-vm-02 can come in. Everyone else is blocked.
+
+  # 2. ALLOW Egress (Outbound) ONLY to test-vm-02
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 192.168.0.182/32 # Allows test-vm-01 to reply to test-vm-02
