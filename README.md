@@ -50,29 +50,72 @@ spec:
 
 ---
 
-## 3. Real-World Lab Validation Results
-The following test scenarios verify the runtime enforcement of the OVN-Kubernetes stateful firewall rules:
+## 3. Lab Validation Results
 
-Test Case 1: Bastion Management Plane Verification
-Action: Initiated SSH sessions from ocp-bastion (192.168.0.182) to both test-vm-01 and test-vm-02.
+The following validation scenarios were executed to verify traffic enforcement behavior on the OVN-Kubernetes secondary network (`nad-04`) using `MultiNetworkPolicy`.
 
-Result: SUCCESS. Administrative access is maintained perfectly.
+### Test Case 1 — Bastion Management Access
 
-Test Case 2: East-West Lateral Traffic & Internet Isolation
-Action: Attempted an internal ICMP ping from test-vm-01 to test-vm-02 (192.168.7.30), and an external ping to public DNS (8.8.8.8).
+**Source:** `ocp-bastion (192.168.0.182)`  
+**Destination:** `test-vm-01`, `test-vm-02`  
+**Protocol:** SSH (TCP/22)
 
-Result: 100% PACKET LOSS. The implicit default-deny engine natively drops unlisted paths. Conversely, test-vm-02 (unrestricted by policy) reaches public networks successfully (~30ms response).
+**Result:** ✅ Allowed
 
-Test Case 3: VM-to-VM SSH Blocking
-Action: Attempted a direct network hop via SSH between the two local VMs sharing the same host hardware and VLAN.
+Administrative SSH access from the bastion host to both virtual machines remained operational after policy enforcement. This confirms that explicitly permitted management traffic continues to function normally.
 
-Result: CONNECTION TIMEOUT. East-West lateral network exploration is thoroughly blocked at the vNIC layer.
-4. Key Security Takeaways
-Distributed Firewalling: Rules are evaluated natively in the Open vSwitch (OVS) data plane at the virtual port level before packets reach the physical switch.
+---
 
-VLAN Membership ≠ Trust: Even when sharing a broadcast domain, workloads are securely micro-segmented based on runtime Kubernetes identity.
+### Test Case 2 — East-West Traffic Isolation
 
-Zero-Trust for Hybrid Layouts: OpenShift provides unified, enterprise-grade distributed network security across modern containers and legacy virtual machines without the bloated overhead of traditional, vendor-locked virtualization engines.
+**Source:** `test-vm-01 (192.168.7.20)`  
+**Destination:** `test-vm-02 (192.168.7.30)`  
+**Protocol:** ICMP / SSH
+
+**Result:** ❌ Blocked
+
+Although both virtual machines are connected to the same VLAN (`VLAN 200`) and share the same Layer 2 broadcast domain, all direct east-west communication attempts were denied by the applied `MultiNetworkPolicy`.
+
+This validates workload-level isolation independent of VLAN membership.
+
+---
+
+### Test Case 3 — Internet Egress Restriction
+
+**Source:** `test-vm-01 (192.168.7.20)`  
+**Destination:** External Networks / Internet  
+**Protocol:** ICMP / General Egress
+
+**Result:** ❌ Blocked
+
+External connectivity attempts from `test-vm-01`, including ICMP requests to public destinations such as `8.8.8.8`, failed successfully due to the restrictive egress policy.
+
+Only explicitly permitted destinations defined in the policy were reachable.
+
+---
+
+### Test Case 4 — Unrestricted Workload Validation
+
+**Source:** `test-vm-02 (192.168.7.30)`  
+**Destination:** Internet
+
+**Result:** ✅ Allowed
+
+Because `test-vm-02` was not targeted by the `MultiNetworkPolicy`, outbound internet connectivity remained fully operational.
+
+This confirms that policy enforcement was applied selectively only to the labeled workload (`app=test-vm-01`).
+
+---
+
+### Validation Summary
+
+| Test Scenario | Expected Result | Actual Result |
+|---|---|---|
+| Bastion → test-vm-01 SSH | Allowed | ✅ Success |
+| Bastion → test-vm-02 SSH | Allowed | ✅ Success |
+| test-vm-01 → test-vm-02 | Blocked | ✅ Blocked |
+| test-vm-01 → Internet | Blocked | ✅ Blocked |
+| test-vm-02 → Internet | Allowed | ✅ Success |
 
 
 ---
