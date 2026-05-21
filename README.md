@@ -19,7 +19,19 @@ The lab was executed on OpenShift Container Platform (OCP) 4.20 using a flat Lay
 
 ---
 
-## 2. Microsegmentation Policy Configuration
+## 2.OVN-Kubernetes and Bond Topology
+
+The following diagram shows the worker node networking topology used during validation, including the Linux bond (`bond01`), physical interfaces (`ens19`, `ens20`), OVN integration bridge, and external bridge configuration.
+
+![OVN Topology](images/ovn-secondary-network-topology.png)
+
+The OVN-Kubernetes secondary network was attached through a bonded Linux interface (`bond01`) backed by physical NICs `ens19` and `ens20`.
+
+Traffic from the secondary VLAN-backed network is forwarded through OVN/Open vSwitch (OVS), enabling policy enforcement through MultiNetworkPolicy while maintaining integration with the enterprise Layer 2 network.
+
+---
+
+## 3. Microsegmentation Policy Configuration
 
 Because the secondary network is an unmanaged, flat Layer 2 `localnet` configuration (no internal `subnets` specified in the NAD), OpenShift relies on explicit Layer 3/Layer 4 IP boundaries. The following `MultiNetworkPolicy` was applied to isolate `test-vm-01` entirely, restricting its ingress and egress traffic **exclusively** to the management bastion host.
 
@@ -50,7 +62,7 @@ spec:
 
 ---
 
-## 3. Lab Validation Results
+## 4. Lab Validation Results
 
 The following validation scenarios were executed to verify traffic enforcement behavior on the OVN-Kubernetes secondary network (`nad-04`) using `MultiNetworkPolicy`.
 
@@ -120,7 +132,7 @@ This confirms that policy enforcement was applied selectively only to the labele
 
 ---
 
-## 4. Conclusion
+## 5. Conclusion
 This lab demonstrates that Red Hat OpenShift provides effective cloud-native microsegmentation capabilities for virtualized workloads using OVN-Kubernetes and MultiNetworkPolicy enforcement.
 
 ---
