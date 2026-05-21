@@ -23,7 +23,7 @@ The lab was executed on OpenShift Container Platform (OCP) 4.20 using a flat Lay
 
 The following diagram shows the worker node networking topology used during validation, including the Linux bond (`bond01`), physical interfaces (`ens19`, `ens20`), OVN integration bridge, and external bridge configuration.
 
-![OVN Topology](images/ovn-secondary-network-topology.png)
+![OpenShift Microsegmentation Architecture](images/ovn-secondary-network-topology.png)
 
 The OVN-Kubernetes secondary network was attached through a bonded Linux interface (`bond01`) backed by physical NICs `ens19` and `ens20`.
 
