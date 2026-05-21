@@ -19,7 +19,7 @@ The lab was executed on OpenShift Container Platform (OCP) 4.20 using a flat Lay
 
 ---
 
-## 2.OVN-Kubernetes and Bond Topology
+## 2. OVN-Kubernetes and Bond Topology
 
 The following diagram shows the worker node networking topology used during validation, including the Linux bond (`bond01`), physical interfaces (`ens19`, `ens20`), OVN integration bridge, and external bridge configuration.
 
