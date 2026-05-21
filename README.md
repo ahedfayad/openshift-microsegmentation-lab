@@ -46,6 +46,7 @@ spec:
   - to:
     - ipBlock:
         cidr: 192.168.0.182/32 # ALLOW Outbound Traffic to Bastion Only
+```
 
 ---
 
