@@ -76,3 +76,8 @@ Zero-Trust for Hybrid Layouts: OpenShift provides unified, enterprise-grade dist
 
 
 ---
+
+## 4. Conclusion
+This lab demonstrates that Red Hat OpenShift provides effective cloud-native microsegmentation capabilities for virtualized workloads using OVN-Kubernetes and MultiNetworkPolicy enforcement.
+
+---
